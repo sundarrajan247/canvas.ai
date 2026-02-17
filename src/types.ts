@@ -1,87 +1,17 @@
-﻿export type CanvasStatus = 'on_track' | 'at_risk' | 'behind';
-export type AppTab = 'canvas' | 'focus' | 'goals' | 'todo' | 'inbox';
-export type AppViewMode = 'home' | 'canvas';
-export type SourceType = 'gmail' | 'calendar' | 'school';
-export type MemberRole = 'viewer' | 'editor';
-export type SuggestedActionType = 'draft_reply' | 'add_to_calendar' | 'create_task';
-export type RecommendationState = 'pending' | 'accepted' | 'dismissed';
-export type RecommendationActionType = 'internal_task' | 'calendar_event' | 'email_draft';
-export type ChatRole = 'user' | 'assistant' | 'system';
+﻿export type AppTab = 'canvas' | 'focus' | 'goals' | 'todo' | 'inbox';
+export type MobileNav = 'focus' | 'canvases' | 'profile';
 
-export interface Goal {
-  id: string;
-  title: string;
-  horizon: 'near_term' | 'this_quarter' | 'yearly';
-  summary: string;
-}
-
-export interface SubTask {
-  id: string;
-  text: string;
-  done: boolean;
-}
-
-export interface TaskGroup {
-  id: string;
-  title: string;
-  due: string;
-  source: SourceType | 'internal' | 'todoist';
-  subtasks: SubTask[];
-}
-
-export interface InboxItem {
-  id: string;
-  source: SourceType;
-  title: string;
-  excerpt: string;
-  date: string;
-  actionable: boolean;
-  importance: 'high' | 'medium' | 'low';
-  suggestedActionType?: SuggestedActionType;
-}
-
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  day: string;
-  time: string;
-  type: 'existing' | 'recommended';
-}
-
-export interface Recommendation {
-  id: string;
-  title: string;
-  urgency: 'low' | 'medium' | 'high';
-  risk: 'low' | 'medium' | 'high';
-  rationale: string;
-  details: string;
-  source: SourceType | 'internal';
-  actionType: RecommendationActionType;
-  impact: string;
-  state: RecommendationState;
-  requiresApproval: boolean;
-}
-
-export interface MemoryEntry {
-  id: string;
-  text: string;
-  type: 'preference' | 'decision' | 'insight';
-  timestamp: string;
-}
-
-export interface Memory {
-  id: string;
-  type: 'principle' | 'constraint' | 'decision';
-  text: string;
-  createdAt: string;
-  sourceMessageId?: string;
+export interface Profile {
+  user_id: string;
+  handle: string;
+  display_name: string | null;
 }
 
 export interface Member {
   id: string;
   name?: string;
   email: string;
-  role: MemberRole;
+  role: 'viewer' | 'editor';
 }
 
 export interface ShareInfo {
@@ -89,55 +19,69 @@ export interface ShareInfo {
   link: string;
 }
 
-export interface Assessment {
-  updatedAt: string;
-  goingWell: string[];
-  improve: string[];
-  watchouts: string[];
+export interface CanvasRecord {
+  id: string;
+  owner_user_id: string;
+  name: string;
+  subtitle: string;
+  avatar_initials: string;
+  status_label: 'On Track' | 'At Risk' | 'Behind';
+  share_code: string;
+  invite_link: string;
+  members: Member[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoalRecord {
+  id: string;
+  canvas_id: string;
+  title: string;
+  summary: string;
+  horizon: 'near_term' | 'this_quarter' | 'yearly';
+  created_at: string;
+}
+
+export interface TodoRecord {
+  id: string;
+  canvas_id: string;
+  text: string;
+  is_done: boolean;
+  created_at: string;
+}
+
+export interface Memory {
+  id: string;
+  canvas_id: string;
+  type: 'principle' | 'constraint' | 'decision';
+  text: string;
+  created_at: string;
+  source_message_id?: string | null;
+}
+
+export interface Recommendation {
+  id: string;
+  canvasId: string;
+  title: string;
+  rationale: string;
+  source: 'gmail' | 'calendar' | 'internal';
+  primaryActionType: 'run' | 'draft' | 'schedule' | 'create_task';
+  createdAt: string;
+}
+
+export interface InboxItem {
+  id: string;
+  canvasId: string;
+  source: 'gmail' | 'calendar' | 'school';
+  title: string;
+  body: string;
+  time: string;
+  suggestedActionType: 'draft_reply' | 'add_to_calendar' | 'create_task';
 }
 
 export interface ChatMessage {
   id: string;
-  role: ChatRole;
+  role: 'user' | 'assistant';
   text: string;
   timestamp: string;
-  imageUrl?: string;
-}
-
-export interface Canvas {
-  id: string;
-  name: string;
-  avatarInitials: string;
-  subtitle: string;
-  status: CanvasStatus;
-  statusLabel: string;
-  shareInfo: ShareInfo;
-  members: Member[];
-  integrations: {
-    gmail: boolean;
-    calendar: boolean;
-    school: boolean;
-  };
-  goals: Goal[];
-  taskGroups: TaskGroup[];
-  inbox: InboxItem[];
-  calendar: CalendarEvent[];
-  recommendations: Recommendation[];
-  memory: MemoryEntry[];
-  memories: Memory[];
-  assessment: Assessment;
-  chat: ChatMessage[];
-}
-
-export interface FeedRecommendation extends Recommendation {
-  canvasId: string;
-  canvasName: string;
-}
-
-export interface FeedbackEntry {
-  id: string;
-  rating: number;
-  category: 'workflow' | 'mobile' | 'automation' | 'integrations' | 'design';
-  notes: string;
-  createdAt: string;
 }

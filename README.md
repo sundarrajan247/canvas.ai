@@ -1,41 +1,82 @@
-# Canvas Demo Prototype
+# Canvas (Supabase Persistence Demo)
 
-Localhost-first, no-backend interactive prototype for the Canvas concept.
+Investor/demo-ready mobile-first Canvas prototype with real user accounts and Postgres persistence.
 
-## Run
+## Stack
+
+- React + Vite + TypeScript
+- Zustand state store
+- Supabase Auth + Postgres + RLS
+- Tailwind CSS + lucide-react icons
+
+## Local Setup
+
+1. Install dependencies:
 
 ```bash
 npm install
+```
+
+2. Copy env file and fill values:
+
+```bash
+cp .env.example .env
+```
+
+Required variables:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+3. Run SQL migration in Supabase SQL Editor:
+
+- File: `supabase/migrations/20260217_canvas_auth_persistence.sql`
+
+4. Start app:
+
+```bash
 npm run dev
 ```
 
 Open `http://localhost:5173`.
 
+## Auth and Demo User
+
+- Create account using any email/password from login screen.
+- On first login, profile row is auto-created in `profiles`.
+- Default handle is set to `supriya0506` (editable in Profile tab).
+
+## Persisted Data
+
+The following persist in Supabase and survive refresh/session changes:
+
+- Canvases
+- Goals
+- Todos
+- Memories
+- Profile handle
+
 ## GitHub Pages
 
-This repo deploys automatically via GitHub Actions on push to `main`.
 Published URL:
 
-`https://sundarrajan247.github.io/canvas.ai/`
+- `https://sundarrajan247.github.io/canvas.ai/`
 
-## Login
+Set repository secrets for deploy builds:
 
-- Username: `admin`
-- Password: `admin`
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
 
-## Demo Flows
+Workflow file already injects these into `npm run build`.
 
-1. Login and switch between canvases in the left rail.
-2. Open `Vikram Development` and review recommendation cards in `Feed`.
-3. Accept and dismiss recommendations to see state/memory updates.
-4. Open `Inbox` and test `+` / `-` item actions and source filtering.
-5. Use chat prompt chips, type custom prompts, upload an image, and test mic dictation fallback.
-6. Open `Memory` and trigger `Assess now`.
-7. Open `Feedback` and submit feature requests; entries persist in local storage.
-8. Use `Reset Demo` to restore seed state.
+## Manual Persistence Test Checklist
 
-## Notes
-
-- This is a front-end prototype only (no real OAuth, Gmail, Calendar, or LLM calls).
-- Data is seeded from local JSON and persisted via browser `localStorage`.
-
+1. Sign up / sign in.
+2. Create a canvas from Canvases modal.
+3. Open that canvas and add:
+   - one goal
+   - one todo
+   - one memory
+4. Refresh browser: confirm all items still exist.
+5. Logout, login again with same account: confirm same data appears.
+6. Edit handle in Profile and refresh: confirm handle persists.
