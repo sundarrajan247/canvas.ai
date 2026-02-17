@@ -11,6 +11,13 @@ npm run dev
 
 Open `http://localhost:5173`.
 
+## GitHub Pages
+
+This repo deploys automatically via GitHub Actions on push to `main`.
+Published URL:
+
+`https://sundarrajan247.github.io/canvas.ai/`
+
 ## Login
 
 - Username: `admin`

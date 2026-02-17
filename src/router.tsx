@@ -13,11 +13,16 @@ function PublicRoute() {
   return isAuthenticated ? <Navigate to="/app" replace /> : <LoginPage />;
 }
 
-const router = createBrowserRouter([
-  { path: '/', element: <Navigate to="/login" replace /> },
-  { path: '/login', element: <PublicRoute /> },
-  { path: '/app', element: <ProtectedRoute /> }
-]);
+const router = createBrowserRouter(
+  [
+    { path: '/', element: <Navigate to="/login" replace /> },
+    { path: '/login', element: <PublicRoute /> },
+    { path: '/app', element: <ProtectedRoute /> }
+  ],
+  {
+    basename: import.meta.env.BASE_URL
+  }
+);
 
 export function AppRouter() {
   return <RouterProvider router={router} />;
