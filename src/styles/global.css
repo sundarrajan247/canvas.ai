@@ -1,0 +1,818 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #fafafa;
+  --bg-soft: #f3f3f3;
+  --surface: #ffffff;
+  --surface-2: #fafafa;
+  --border: #dbdbdb;
+  --text: #101010;
+  --muted: #8e8e8e;
+  --accent: #0095f6;
+  --accent-hover: #1877f2;
+  --danger: #ed4956;
+  --overlay: #00000055;
+}
+
+body[data-theme='dark'] {
+  --bg: #0f1115;
+  --bg-soft: #131722;
+  --surface: #171b25;
+  --surface-2: #10141d;
+  --border: #2a3242;
+  --text: #f5f7fb;
+  --muted: #a7b0c3;
+  --accent: #4da3ff;
+  --accent-hover: #69b2ff;
+  --danger: #ff6b78;
+  --overlay: #00000080;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.subtle {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.login-page {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, var(--bg), var(--bg-soft));
+  padding: 1.5rem;
+}
+
+.login-glow {
+  display: none;
+}
+
+.login-card {
+  width: min(420px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.login-card h1 {
+  font-family: 'Grand Hotel', cursive;
+  font-size: 2.8rem;
+  text-align: center;
+  line-height: 0.9;
+  font-weight: 400;
+}
+
+.login-subtitle,
+.hint {
+  text-align: center;
+}
+
+.login-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+input,
+textarea,
+select {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #a8a8a8;
+  background: var(--surface);
+}
+
+.accept-btn,
+.dismiss-btn,
+.ghost-btn,
+.danger-btn,
+.home-nav,
+.tab-btn,
+.chip-btn,
+.filter-chip,
+.circle-btn {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.accept-btn {
+  background: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
+  font-weight: 600;
+  padding: 0.5rem 0.9rem;
+}
+
+.accept-btn:hover {
+  background: var(--accent-hover);
+}
+
+.ghost-btn,
+.dismiss-btn,
+.home-nav,
+.tab-btn,
+.chip-btn,
+.filter-chip {
+  padding: 0.45rem 0.75rem;
+}
+
+.danger-btn {
+  background: var(--surface);
+  color: var(--danger);
+  border-color: var(--danger);
+  padding: 0.45rem 0.75rem;
+}
+
+.error-text {
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.app-shell {
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.sidebar,
+.topbar,
+.tab-nav-wrap,
+.panel-card,
+.chat-panel,
+.feedback-drawer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.sidebar {
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+}
+
+.sidebar.collapsed {
+  width: 86px;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar h2 {
+  font-family: 'Grand Hotel', cursive;
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.home-nav.active,
+.tab-btn.active,
+.filter-chip.active {
+  background: var(--text);
+  color: var(--surface);
+  border-color: var(--text);
+}
+
+.sidebar-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.canvas-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.canvas-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.7rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 10px;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.canvas-item.active {
+  border-color: var(--text);
+}
+
+.canvas-title {
+  font-weight: 600;
+}
+
+.status-chip {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.status-ok {
+  background: #e8f7ec;
+  color: #1e7f3d;
+}
+
+.status-risk {
+  background: #fff4dd;
+  color: #9a6a00;
+}
+
+.status-behind {
+  background: #ffe8ea;
+  color: #b42334;
+}
+
+.app-main {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 0.7rem;
+}
+
+.topbar {
+  padding: 0.9rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.topbar-brand {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.brand-wordmark {
+  font-family: 'Grand Hotel', cursive;
+  font-size: 1.8rem;
+  line-height: 0.8;
+}
+
+.topbar h1 {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: clamp(1.2rem, 2.4vw, 1.9rem);
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.tab-nav-wrap {
+  padding: 0.45rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.tab-nav,
+.tab-actions,
+.filter-row,
+.prompt-chips,
+.agent-hints {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.circle-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+
+.panel-grid {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+  min-height: 0;
+  overflow: auto;
+}
+
+.panel-grid.two-col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.panel-card {
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.hero-head h3,
+.panel-card h3 {
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.global-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.global-metrics div {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.global-metrics strong {
+  font-size: 1.35rem;
+}
+
+.reco-list,
+.goal-list,
+.todo-group-list,
+.memory-list,
+.feedback-history {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.goal-item.deluxe,
+.todo-group-card,
+.reco-card,
+.inbox-item.deluxe,
+.memory-item,
+.feedback-item,
+.calendar-event {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 0.7rem;
+}
+
+.goal-item.deluxe {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.goal-item.deluxe h4 {
+  font-size: 1.15rem;
+}
+
+.goal-horizon,
+.memory-item small,
+.feedback-item small,
+.todo-group-card small,
+.reco-card small {
+  color: var(--muted);
+}
+
+.section-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.inline-form,
+.inline-subtask {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem;
+  width: min(520px, 100%);
+}
+
+.assessment-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.assessment-block {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.assessment-block h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.todo-group-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.link-btn {
+  background: transparent;
+  border: none;
+  color: var(--danger);
+  font-weight: 600;
+  padding: 0;
+  align-self: start;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+.subtask-list {
+  margin-top: 0.5rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.subtask-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.tiny-icon {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 999px;
+}
+
+.inbox-item.deluxe {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+}
+
+.signal-dot,
+.source-chip,
+.meta-chip {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  width: fit-content;
+}
+
+.source-gmail {
+  background: #ffeef2;
+}
+
+.source-calendar {
+  background: #edf4ff;
+}
+
+.source-school {
+  background: #ecf9ee;
+}
+
+.reco-card {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.reco-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.reco-head h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.canvas-caption {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.reco-meta {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.chip-high {
+  background: #ffe7eb;
+  color: #ad223a;
+}
+
+.chip-medium {
+  background: #fff4de;
+  color: #8b6100;
+}
+
+.chip-low {
+  background: #ebf9ef;
+  color: #1f7b40;
+}
+
+.meta-chip.neutral {
+  background: #f2f2f2;
+}
+
+.theme-btn {
+  min-width: 72px;
+  font-weight: 600;
+}
+
+.reco-expanded {
+  border-left: 2px solid var(--text);
+  padding-left: 0.5rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.reco-actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.push-right {
+  flex: 1;
+}
+
+.resolution {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.chat-panel.agentic {
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.chat-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.hint-pill {
+  font-size: 0.72rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+}
+
+.chip-btn {
+  font-size: 0.78rem;
+}
+
+.chat-thread {
+  min-height: 140px;
+  max-height: 240px;
+  overflow: auto;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.chat-bubble {
+  max-width: 80%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.chat-bubble.user {
+  margin-left: auto;
+  background: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
+}
+
+.chat-bubble.assistant {
+  background: var(--surface);
+}
+
+.chat-bubble.typing {
+  color: var(--muted);
+}
+
+.chat-image {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.chat-compose {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.feedback-drawer {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  width: min(400px, calc(100vw - 2rem));
+  z-index: 30;
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.feedback-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.feedback-form {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  display: grid;
+  place-items: center;
+  z-index: 40;
+}
+
+.modal-card {
+  width: min(460px, 92%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+@media (max-width: 1080px) {
+  .app-shell {
+    grid-template-columns: 84px 1fr;
+  }
+
+  .global-metrics,
+  .panel-grid.two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 780px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    padding: 0.6rem;
+  }
+
+  .sidebar {
+    order: 2;
+  }
+
+  .app-main {
+    order: 1;
+  }
+
+  .topbar {
+    flex-direction: column;
+  }
+
+  .chat-compose {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .chat-compose .accept-btn {
+    grid-column: 1 / -1;
+  }
+}
+
+body[data-theme='dark'] .status-ok {
+  background: #143424;
+  color: #8de2b5;
+}
+
+body[data-theme='dark'] .status-risk {
+  background: #3a2c10;
+  color: #f4cf84;
+}
+
+body[data-theme='dark'] .status-behind {
+  background: #3c1d25;
+  color: #ff9aa9;
+}
+
+body[data-theme='dark'] .source-gmail {
+  background: #3a2230;
+}
+
+body[data-theme='dark'] .source-calendar {
+  background: #1f3248;
+}
+
+body[data-theme='dark'] .source-school {
+  background: #203827;
+}
+
+body[data-theme='dark'] .chip-high {
+  background: #4a1f2a;
+  color: #ffafbf;
+}
+
+body[data-theme='dark'] .chip-medium {
+  background: #453715;
+  color: #ffd98e;
+}
+
+body[data-theme='dark'] .chip-low {
+  background: #173525;
+  color: #9fe2bf;
+}
+
+body[data-theme='dark'] .meta-chip.neutral {
+  background: #2a3141;
+  color: #ccd3e5;
+}
+
+body[data-theme='dark'] .chat-bubble.user {
+  color: #ffffff;
+}
+
+
