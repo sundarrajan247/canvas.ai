@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+ï»¿import { useEffect, useMemo, useState } from 'react';
 import {
   Bot,
   Calendar,
@@ -124,18 +124,29 @@ export function AppPage() {
   const memories = activeCanvas ? memoriesByCanvas[activeCanvas.id] ?? [] : [];
   const chat = activeCanvas ? chatByCanvas[activeCanvas.id] ?? [] : [];
 
+  const hasCanvasContent = (canvasId: string) => {
+    const goalCount = goalsByCanvas[canvasId]?.length ?? 0;
+    const todoCount = todosByCanvas[canvasId]?.length ?? 0;
+    const memoryCount = memoriesByCanvas[canvasId]?.length ?? 0;
+    return goalCount + todoCount + memoryCount > 0;
+  };
+
   const recommendations = useMemo(() => {
     if (activeCanvas) {
+      if (!hasCanvasContent(activeCanvas.id)) return [];
       return seededRecommendations(activeCanvas.id, activeCanvas.name);
     }
 
-    return canvases.flatMap((canvas) => seededRecommendations(canvas.id, canvas.name));
-  }, [activeCanvas, canvases]);
+    return canvases
+      .filter((canvas) => hasCanvasContent(canvas.id))
+      .flatMap((canvas) => seededRecommendations(canvas.id, canvas.name));
+  }, [activeCanvas, canvases, goalsByCanvas, memoriesByCanvas, todosByCanvas]);
 
   const inbox = useMemo(() => {
     if (!activeCanvas) return [];
+    if (!hasCanvasContent(activeCanvas.id)) return [];
     return seededInboxForCanvas(activeCanvas.id);
-  }, [activeCanvas]);
+  }, [activeCanvas, goalsByCanvas, memoriesByCanvas, todosByCanvas]);
 
   const visibleCanvases = useMemo(() => {
     const query = canvasSearch.trim().toLowerCase();
@@ -234,6 +245,14 @@ export function AppPage() {
                     </article>
                   );
                 })}
+                {recommendations.length === 0 ? (
+                  <article className={panel}>
+                    <h4 className="text-base font-semibold">No recommendations yet</h4>
+                    <p className={`mt-1 text-sm ${dark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Add goals, todos, or memories in this canvas to generate focused suggestions.
+                    </p>
+                  </article>
+                ) : null}
               </section>
             ) : null}
 
@@ -409,6 +428,14 @@ export function AppPage() {
                       </article>
                     );
                   })}
+                  {inbox.length === 0 ? (
+                    <article className={`rounded-xl border p-3 ${dark ? 'border-white/10 bg-white/[0.03]' : 'border-slate-200 bg-slate-50'}`}>
+                      <p className="text-sm font-medium">Inbox is empty</p>
+                      <p className={`mt-1 text-sm ${dark ? 'text-slate-400' : 'text-slate-600'}`}>
+                        Connect sources and add goals to start receiving actionable signals.
+                      </p>
+                    </article>
+                  ) : null}
                 </div>
               </section>
             ) : null}
@@ -510,10 +537,11 @@ export function AppPage() {
 
               <form
                 className="mb-3 flex gap-2"
-                onSubmit={(event) => {
+                onSubmit={async (event) => {
                   event.preventDefault();
                   if (!newCanvasName.trim()) return;
-                  void createCanvas(newCanvasName.trim());
+                  const created = await createCanvas(newCanvasName.trim());
+                  if (!created) return;
                   setNewCanvasName('');
                   setCanvasSwitcherOpen(false);
                 }}
@@ -575,7 +603,7 @@ export function AppPage() {
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <h3 className={`text-sm font-semibold uppercase tracking-wide ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Chat {activeCanvas ? `• ${activeCanvas.name}` : '• Global disabled'}
+                  Chat {activeCanvas ? `â€¢ ${activeCanvas.name}` : 'â€¢ Global disabled'}
                 </h3>
                 <p className={`text-xs ${dark ? 'text-slate-500' : 'text-slate-500'}`}>{modeHint(activeCanvasTab)}</p>
               </div>
@@ -630,3 +658,4 @@ async function copyText(value: string, setToast: (text: string) => void) {
     setToast('Copy failed');
   }
 }
+

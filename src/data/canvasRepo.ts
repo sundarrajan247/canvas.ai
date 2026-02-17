@@ -1,17 +1,38 @@
-﻿import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import type { CanvasRecord, GoalRecord, Memory, Profile, TodoRecord } from '../types';
+
+type CanvasTableName = 'canvases' | 'canvasas';
+let resolvedCanvasTable: CanvasTableName | null = null;
+
+async function resolveCanvasTable(): Promise<CanvasTableName> {
+  if (resolvedCanvasTable) return resolvedCanvasTable;
+
+  const canvasesProbe = await supabase.from('canvases').select('id').limit(1);
+  if (!canvasesProbe.error) {
+    resolvedCanvasTable = 'canvases';
+    return resolvedCanvasTable;
+  }
+
+  const canvasasProbe = await supabase.from('canvasas').select('id').limit(1);
+  if (!canvasasProbe.error) {
+    resolvedCanvasTable = 'canvasas';
+    return resolvedCanvasTable;
+  }
+
+  throw canvasesProbe.error ?? canvasasProbe.error ?? new Error('Could not resolve canvases table');
+}
 
 export async function ensureProfile(userId: string, email?: string): Promise<Profile> {
   const { data: existing } = await supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle();
   if (existing) return existing as Profile;
 
-  const baseHandle = 'supriya0506';
+  const baseHandle = email?.split('@')[0]?.toLowerCase()?.replace(/[^a-z0-9_]/g, '') || 'user';
   let handle = baseHandle;
-  for (let i = 0; i < 10; i += 1) {
+  for (let i = 0; i < 20; i += 1) {
     const trial = i === 0 ? handle : `${baseHandle}${i}`;
     const { data, error } = await supabase
       .from('profiles')
-      .insert({ user_id: userId, handle: trial, display_name: email?.split('@')[0] ?? 'Supriya' })
+      .insert({ user_id: userId, handle: trial, display_name: email?.split('@')[0] ?? 'User' })
       .select('*')
       .single();
     if (!error && data) return data as Profile;
@@ -21,12 +42,14 @@ export async function ensureProfile(userId: string, email?: string): Promise<Pro
 }
 
 export async function listCanvases(userId: string): Promise<CanvasRecord[]> {
-  const { data, error } = await supabase.from('canvases').select('*').eq('owner_user_id', userId).order('created_at', { ascending: true });
+  const table = await resolveCanvasTable();
+  const { data, error } = await supabase.from(table).select('*').eq('owner_user_id', userId).order('created_at', { ascending: true });
   if (error) throw error;
   return (data ?? []) as CanvasRecord[];
 }
 
 export async function createCanvas(userId: string, canvas: Partial<CanvasRecord>): Promise<CanvasRecord> {
+  const table = await resolveCanvasTable();
   const payload = {
     owner_user_id: userId,
     name: canvas.name ?? 'New Canvas',
@@ -38,19 +61,21 @@ export async function createCanvas(userId: string, canvas: Partial<CanvasRecord>
     members: canvas.members ?? []
   };
 
-  const { data, error } = await supabase.from('canvases').insert(payload).select('*').single();
+  const { data, error } = await supabase.from(table).insert(payload).select('*').single();
   if (error) throw error;
   return data as CanvasRecord;
 }
 
 export async function updateCanvas(canvasId: string, patch: Partial<CanvasRecord>): Promise<CanvasRecord> {
-  const { data, error } = await supabase.from('canvases').update(patch).eq('id', canvasId).select('*').single();
+  const table = await resolveCanvasTable();
+  const { data, error } = await supabase.from(table).update(patch).eq('id', canvasId).select('*').single();
   if (error) throw error;
   return data as CanvasRecord;
 }
 
 export async function deleteCanvas(canvasId: string): Promise<void> {
-  const { error } = await supabase.from('canvases').delete().eq('id', canvasId);
+  const table = await resolveCanvasTable();
+  const { error } = await supabase.from(table).delete().eq('id', canvasId);
   if (error) throw error;
 }
 

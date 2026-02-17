@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Session, User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabaseClient';
+import { hasSupabaseConfig, supabase } from '../lib/supabaseClient';
 import {
   addGoal as repoAddGoal,
   addMemory as repoAddMemory,
@@ -74,7 +74,7 @@ interface AppStore {
   loadUserData: () => Promise<void>;
   loadCanvasContent: (canvasId: string) => Promise<void>;
 
-  createCanvas: (name: string) => Promise<void>;
+  createCanvas: (name: string) => Promise<boolean>;
   updateCanvas: (canvasId: string, patch: Partial<CanvasRecord>) => Promise<void>;
   deleteCanvas: (canvasId: string) => Promise<void>;
 
@@ -113,9 +113,9 @@ const modeLabel = (tab: AppTab) => {
 
 const DEMO_CANVASES = [
   {
-    name: 'Vikram Development',
+    name: 'Kid Schooling',
     subtitle: 'Academic outcomes and family execution system',
-    avatar_initials: 'VD',
+    avatar_initials: 'KS',
     status_label: 'At Risk' as const,
     goals: ['Raise English writing consistency', 'Protect confidence under exam pressure'],
     todos: ['Schedule two prep blocks before Friday', 'Draft teacher follow-up update'],
@@ -174,6 +174,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
     if (authInitialized) return;
     authInitialized = true;
 
+    if (!hasSupabaseConfig) {
+      set({
+        isAuthReady: true,
+        isLoading: false,
+        isAuthenticated: false,
+        authError: 'Missing Supabase config. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.'
+      });
+      return;
+    }
+
     set({ isLoading: true });
     const {
       data: { session }
@@ -225,6 +235,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   signIn: async (email, password) => {
+    if (!hasSupabaseConfig) {
+      set({ authError: 'Missing Supabase config. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.' });
+      return false;
+    }
     set({ authError: '', isLoading: true });
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     set({ isLoading: false });
@@ -236,6 +250,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   signUp: async (email, password) => {
+    if (!hasSupabaseConfig) {
+      set({ authError: 'Missing Supabase config. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.' });
+      return false;
+    }
     set({ authError: '', isLoading: true });
     const { error } = await supabase.auth.signUp({ email, password });
     set({ isLoading: false });
@@ -296,30 +314,48 @@ export const useAppStore = create<AppStore>((set, get) => ({
   loadUserData: async () => {
     const user = get().user;
     if (!user) return;
-
-    const canvases = await listCanvases(user.id);
+    let canvases: CanvasRecord[] = [];
+    try {
+      canvases = await listCanvases(user.id);
+    } catch (error) {
+      const message =
+        typeof error === 'object' && error && 'message' in error
+          ? String((error as { message?: unknown }).message)
+          : 'Failed to load canvases. Run the Supabase migration.';
+      set({ toast: message });
+      return;
+    }
 
     if (canvases.length === 0) {
       const createdCanvases: CanvasRecord[] = [];
-      for (const entry of DEMO_CANVASES) {
-        const canvas = await repoCreateCanvas(user.id, {
-          name: entry.name,
-          subtitle: entry.subtitle,
-          avatar_initials: entry.avatar_initials,
-          status_label: entry.status_label,
-          members: [{ id: crypto.randomUUID(), email: user.email ?? 'supriya0506@example.com', role: 'editor', name: 'supriya0506' }]
-        });
+      try {
+        for (const entry of DEMO_CANVASES) {
+          const canvas = await repoCreateCanvas(user.id, {
+            name: entry.name,
+            subtitle: entry.subtitle,
+            avatar_initials: entry.avatar_initials,
+            status_label: entry.status_label,
+            members: [{ id: crypto.randomUUID(), email: user.email ?? 'user@example.com', role: 'editor', name: get().profile?.handle ?? 'user' }]
+          });
 
-        createdCanvases.push(canvas);
-        for (const goal of entry.goals) {
-          await repoAddGoal(canvas.id, goal);
+          createdCanvases.push(canvas);
+          for (const goal of entry.goals) {
+            await repoAddGoal(canvas.id, goal);
+          }
+          for (const todo of entry.todos) {
+            await repoAddTodo(canvas.id, todo);
+          }
+          for (const memory of entry.memories) {
+            await repoAddMemory(canvas.id, memory.type, memory.text);
+          }
         }
-        for (const todo of entry.todos) {
-          await repoAddTodo(canvas.id, todo);
-        }
-        for (const memory of entry.memories) {
-          await repoAddMemory(canvas.id, memory.type, memory.text);
-        }
+      } catch (error) {
+        const message =
+          typeof error === 'object' && error && 'message' in error
+            ? String((error as { message?: unknown }).message)
+            : 'Seed canvas creation failed. Check migration and RLS policies.';
+        set({ toast: message });
+        return;
       }
 
       set({ canvases: createdCanvases, activeCanvasId: createdCanvases[0]?.id ?? 'global' });
@@ -329,8 +365,19 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return;
     }
 
-    set({ canvases });
-    const nextActive = get().activeCanvasId === 'global' ? canvases[0]?.id : get().activeCanvasId;
+    const renamedCanvases = await Promise.all(
+      canvases.map(async (canvas) => {
+        if (canvas.name !== 'Vikram Development') return canvas;
+        try {
+          return await repoUpdateCanvas(canvas.id, { name: 'Kid Schooling', avatar_initials: 'KS' });
+        } catch {
+          return canvas;
+        }
+      })
+    );
+
+    set({ canvases: renamedCanvases });
+    const nextActive = get().activeCanvasId === 'global' ? renamedCanvases[0]?.id : get().activeCanvasId;
     if (nextActive && nextActive !== 'global') {
       set({ activeCanvasId: nextActive });
       await get().loadCanvasContent(nextActive);
@@ -361,23 +408,34 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   createCanvas: async (name) => {
     const user = get().user;
-    if (!user || !name.trim()) return;
+    if (!user || !name.trim()) return false;
 
-    const created = await repoCreateCanvas(user.id, {
-      name: name.trim(),
-      subtitle: 'New canvas. Define goals and execution plan.',
-      avatar_initials: initialsFor(name),
-      status_label: 'At Risk',
-      members: [{ id: crypto.randomUUID(), email: user.email ?? 'supriya0506@example.com', role: 'editor', name: get().profile?.handle ?? 'supriya0506' }]
-    });
+    try {
+      const created = await repoCreateCanvas(user.id, {
+        name: name.trim(),
+        subtitle: 'New canvas. Define goals and execution plan.',
+        avatar_initials: initialsFor(name),
+        status_label: 'At Risk',
+        members: [{ id: crypto.randomUUID(), email: user.email ?? 'user@example.com', role: 'editor', name: get().profile?.handle ?? 'user' }]
+      });
 
-    set((state) => ({
-      canvases: [created, ...state.canvases],
-      activeCanvasId: created.id,
-      activeCanvasTab: 'focus'
-    }));
+      set((state) => ({
+        canvases: [created, ...state.canvases],
+        activeCanvasId: created.id,
+        activeCanvasTab: 'focus'
+      }));
 
-    await get().loadCanvasContent(created.id);
+      await get().loadCanvasContent(created.id);
+      set({ toast: 'Canvas created' });
+      return true;
+    } catch (error) {
+      const message =
+        typeof error === 'object' && error && 'message' in error
+          ? String((error as { message?: unknown }).message)
+          : 'Failed to create canvas';
+      set({ toast: `Create failed: ${message}` });
+      return false;
+    }
   },
 
   updateCanvas: async (canvasId, patch) => {

@@ -90,9 +90,7 @@ export function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-4 text-center text-xs text-slate-500">
-          On first login, profile handle defaults to <span className="font-mono">supriya0506</span>.
-        </p>
+        <p className="mt-4 text-center text-xs text-slate-500">Use your email and password to sign in or create an account.</p>
       </section>
     </main>
   );
